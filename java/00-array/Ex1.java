@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-public class Main {
+public class Ex1 {
 
   public static void main(String[] args) {
 

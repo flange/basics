@@ -1,6 +1,7 @@
 #ifndef __ARRAY_H__
 #define __ARRAY_H__
 
+#include <algorithm>
 #include <array>
 #include <memory>
 #include <string>
@@ -11,46 +12,77 @@ template <typename T, std::size_t N>
 class Array {
 
 private:
-  std::shared_ptr<std::array<T, N>> m_array;
+  T m_data[N];
 
 public:
+  class iterator {
+    friend class Array;
 
+  public:
+    iterator() : m_iter{nullptr} {}
+    iterator(const iterator& other) : m_iter{other.m_iter} {}
 
-  // Fundamental types have indetermined value in std::array.
-  // -> Need to initialize manually.
-  template<
-    typename T_ = T,
-      std::enable_if_t<std::is_fundamental<T_>::value
-    >* = nullptr
-  >
-  explicit Array() : m_array{std::make_shared<std::array<T, N>>()}
-  {
-    m_array->fill(0);
+  private:
+    iterator(T* t) : m_iter{t} {}
+
+  public:
+    T& operator=(const T& other) {
+      iterator tmp{other};
+      std::swap(m_iter, tmp.m_iter);
+
+      return *this;
+    }
+
+    T operator*() {
+      return *m_iter;
+    }
+
+    iterator& operator++() {
+      m_iter++;
+      return *this;
+    }
+
+    iterator operator++(int) {
+      iterator tmp{*this};
+      m_iter++;
+
+      return tmp;
+    }
+
+    bool operator==(const iterator& other) {
+      return (m_iter == other.m_iter);
+    }
+
+    bool operator!=(const iterator& other) {
+      return (m_iter != other.m_iter);
+    }
+
+    friend std::ostream& operator<<(std::ostream& os, const iterator& iter) noexcept {
+      return os << *(iter.m_iter);
+    }
+
+  private:
+    T* m_iter;
+  };
+
+  explicit Array() : m_data{} {}
+
+  iterator begin() {
+    iterator b{m_data};
+    return b;
   }
 
-  template<
-    typename T_ = T,
-    std::enable_if_t<
-      !std::is_fundamental<T_>::value
-    >* = nullptr
-  >
-  explicit Array() : m_array{std::make_shared<std::array<T, N>>()}
-  {}
-
-
-
-
-
-
+  iterator end() {
+    iterator e{m_data + N};
+    return e;
+  }
 
 
 
   T& operator[](const std::size_t& index)
   {
-    return *(m_array)[index];
+    return m_data[index];
   }
-
-
 
 
 
@@ -61,21 +93,16 @@ public:
 
     res << "[ ";
 
-    for (const T& e : *m_array)
-      res << e << " ";
+    for (int i = 0; i < N; ++i)
+      res << m_data[i] << " ";
 
     res << "]";
 
     return res.str();
   }
 
-
-
-
-
-
-
-
 };
+
+
 
 #endif // __ARRAY_H__

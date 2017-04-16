@@ -10,119 +10,10 @@
 #include <vector>
 
 
-class Point {
-public:
-  int x;
-  int y;
-
-  Point() : x{0}, y{0} {}
-  Point(const int& x, const int& y) : x{x}, y{y} {}
-  Point(const Point& other) : x{other.x}, y{other.y} {}
-
-  Point& operator=(const Point& other) {
-    Point tmp{other};
-
-    std::swap(x, tmp.x);
-    std::swap(y, tmp.y);
-
-    return *this;
-  }
-
-  Point& operator=(Point&& other) {
-
-    std::swap(x, other.x);
-    std::swap(y, other.y);
-
-    return *this;
-  }
-
-  friend bool operator==(const Point& a, const Point& b) {
-    return (a.x == b.x) && (a.y == b.y);
-  }
-
-  friend bool operator!=(const Point& a, const Point& b) {
-    return (a.x != b.x) || (a.y != b.y);
-  }
 
 
-  std::string toString() const {
-    std::stringstream res;
-
-    res << "(" << x << ", " << y << ")";
-
-    return res.str();
-  }
-};
-
-class Line {
-public:
-
-  Point a, b;
-
-  int x, y;
-  bool is_vertical, is_horizontal, is_diagonal;
-
-  Line() {}
-
-  Line(const Point& a, const Point& b)
-  : a{a}, b{b}, is_vertical{false}, is_horizontal{false}, is_diagonal{false}
-  {
-    assert(a != b && "Line(): end points need to be different");
-
-    if (a.x == b.x) {
-      x = a.x;
-      is_vertical = true;
-      return;
-    }
-
-    if (a.y == b.y) {
-      y = a.y;
-      is_horizontal = true;
-      return;
-    }
-
-    is_diagonal = true;
-  }
-
-  Line(const Line& other) = default;
-
-  Line& operator=(const Line& other) {
-    Line tmp{other};
-
-    std::swap(a, tmp.a);
-    std::swap(b, tmp.b);
-    std::swap(is_vertical, tmp.is_vertical);
-    std::swap(is_horizontal, tmp.is_horizontal);
-
-    if (is_vertical)
-      std::swap(x, tmp.x);
-    else if (is_horizontal)
-      std::swap(y, tmp.y);
-
-    return *this;
-  }
 
 
-  friend bool operator==(const Line& l1, const Line& l2) {
-    return (l1.a == l2.a) && (l1.b == l2.b);
-  }
-
-
-  std::string toString() const {
-    std::stringstream res;
-
-    res << a.toString() << " -- " << b.toString();
-
-    return res.str();
-  }
-
-};
-
-
-int distance(const Point& a, const Point& b)
-{
-  return (std::abs(a.x - b.x) + std::abs(a.y - b.y));
-}
 
 void closest_pair_bf(const std::vector<Point>& pvec)
 {
@@ -151,9 +42,7 @@ void closest_pair_bf(const std::vector<Point>& pvec)
   std::cout << "closest points: " << closest.first.toString() << " - " << closest.second.toString() << "\n";
 }
 
-bool lines_parallel(const Line& l1, const Line& l2) {
-  return (l1.is_vertical && l2.is_vertical) || (l1.is_horizontal && l2.is_horizontal);
-}
+
 
 bool lines_intersect(const Line& l1, const Line& l2)
 {

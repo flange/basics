@@ -1,67 +1,27 @@
 #include <iostream>
 #include <string>
-#include <type_traits>
 #include <vector>
+#include <type_traits>
 
-
-// base case : gilt für wirklich alles
-template <typename T, typename = int>
-struct HasX : std::false_type {};
-
-// success case
-template <typename T>
-struct HasX <T, decltype((void) T::x, 0)> : std::true_type {
-};
-
-struct A {
+class A {
+public:
   int x;
 };
 
-struct B {
-  bool f;
+class B {
 };
 
-
-
-
-
+template <typename T, typename = int>
+struct has_iterator : std::false_type {};
 
 template <typename T>
-struct is_int : std::false_type {};
-
-template <>
-struct is_int<int> : std::true_type {};
-
-
-
-
-template<typename U>
-struct ClassName
-{
-private:
-  template<typename>
-  static constexpr std::false_type test(...);
-
-  template<typename T = U>
-  static decltype((Expr), std::true_type{}) test(int) ;
-
-public:
-  static constexpr bool value = decltype(test<U>(0))::value;
-};
-
-
-
-
-
-
-
-
+struct has_iterator<T, decltype((void) T::x, 0)> : std::true_type {};
 
 
 int main() {
 
-
-
+  std::cout << has_iterator<A>::value << "\n";
+  std::cout << has_iterator<B>::value << "\n";
 
 
 

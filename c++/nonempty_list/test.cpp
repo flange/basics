@@ -7,46 +7,79 @@
 #include <vector>
 #include <experimental/optional>
 
-struct null_t {};
+template <int N>
+class Int {
+public:
+  static const int value = N;
 
-template <typename T, typename U>
-struct tl
-{
-    using head = T;
-    using tail = U;
+  friend std::ostream& operator<<(std::ostream& os, const Int& n) {
+    return os << n.value;
+  }
 };
 
-using my_list = tl<int, tl<int, tl<int, null_t> > >;
 
+template <int... Ns>
+struct list {};
 
-template <typename TList>
-struct list_content;
+template <int N, int... Ns>
+class list<N, Ns...>  {
+public:
 
-template <typename Head, typename Tail>
-struct list_content<tl<Head, Tail>> {
-    using head = Head;
-    using tail = Tail;
+  Int<N> head;
+  list<Ns...> tail;
+
+  template <int T>
+  list<N, Ns..., T> append(const Int<T>&) {
+    return list<N, Ns..., T>{};
+  }
+
+  std::string toString() const {
+    std::stringstream res;
+
+    res << N << " ";
+    res << tail.toString();
+
+    return res.str();
+  }
+
+  friend std::ostream& operator<<(std::ostream& os, const list<N, Ns...>& l) {
+    os << "[ ";
+    os << l.toString();
+    return os << "]";
+  }
+
 };
 
 template <>
-struct list_content<null_t> {
+class list<> {
+public:
+  template <int N>
+  list<N> append(const Int<N> &) {
+    return list<N>{};
+  }
+
+  std::string toString() const {
+    return "";
+  }
+
+  friend std::ostream& operator<<(std::ostream& os, const list<>&) {
+    return os << "[]";
+  }
 };
-
-template <typename TList>
-using head_t = typename list_content<TList>::head;
-
-template <typename TList>
-using tail_t = typename list_content<TList>::tail;
-
-
-
-using my_list = tl<int, tl<int, tl<int, null_t> > >;
 
 int main() {
 
-  list_content<tl<int, null_t>> l;
+  list<> l;
+  std::cout << l << "\n";
 
-  auto res = l.remove();
+  list<1> l1 = l.append(Int<1>{});
+  std::cout << l1 << "\n";
+
+  list<1, 2> l2 = l1.append(Int<2>{});
+  std::cout << l2 << "\n";
+
+  auto l3 = l2.tail;
+  std::cout << l3 << "\n";
 
   return 0;
 }
